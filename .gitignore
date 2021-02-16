@@ -1,2 +1,5 @@
-*.class
-*.log
+.DS_Store
+data_on_kube.iml
+.idea
+*.tgz
+Chart.lock
