@@ -38,8 +38,8 @@ spec:
         {{- if and (.Values.dags.git.url) (.Values.dags.git.ref) }}
         checksum/dags-git-ref: {{ .Values.dags.git.ref | sha256sum }}
         {{- end }}
-        {{- if .Values.airflow.podAnnotations }}
-        {{- toYaml .Values.airflow.podAnnotations | nindent 8 }}
+        {{- if .Values.podAnnotations }}
+        {{- toYaml .Values.podAnnotations | nindent 8 }}
         {{- end }}
         {{- if .Values.web.podAnnotations }}
         {{- toYaml .Values.web.podAnnotations | nindent 8 }}
@@ -55,9 +55,9 @@ spec:
         {{- toYaml .Values.web.podLabels | nindent 8 }}
         {{- end }}
     spec:
-      {{- if .Values.airflow.image.pullSecret }}
+      {{- if .Values.image.pullSecret }}
       imagePullSecrets:
-        - name: {{ .Values.airflow.image.pullSecret }}
+        - name: {{ .Values.image.pullSecret }}
       {{- end }}
       restartPolicy: Always
       {{- if .Values.web.nodeSelector }}
@@ -141,8 +141,8 @@ spec:
             {{- toYaml .Values.dags.git.gitSync.resources | nindent 12 }}
         {{- end }}
         - name: {{ .Chart.Name }}-web
-          image: {{ .Values.airflow.image.repository }}:{{ .Values.airflow.image.tag }}
-          imagePullPolicy: {{ .Values.airflow.image.pullPolicy}}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy}}
           ports:
             - name: web
               containerPort: 8080
@@ -181,7 +181,7 @@ spec:
               mountPath: {{ .Values.logs.path }}
               subPath: {{ .Values.logs.persistence.subPath }}
             {{- end }}
-            {{- range .Values.airflow.extraConfigmapMounts }}
+            {{- range .Values.extraConfigmapMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
               readOnly: {{ .readOnly }}
@@ -189,8 +189,8 @@ spec:
               subPath: {{ .subPath }}
               {{- end }}
             {{- end }}
-            {{- if .Values.airflow.extraVolumeMounts }}
-            {{- toYaml .Values.airflow.extraVolumeMounts | nindent 12 }}
+            {{- if .Values.extraVolumeMounts }}
+            {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
             {{- end }}
           command:
             - "/usr/bin/dumb-init"
@@ -210,9 +210,9 @@ spec:
                && echo "*** installing requirements..." \
                && /home/airflow/scripts/install-requirements.sh \
               {{- end }}
-              {{- if .Values.airflow.extraPipPackages }}
+              {{- if .Values.extraPipPackages }}
                && echo "*** installing global extra pip packages..." \
-               && pip install --user {{ range .Values.airflow.extraPipPackages }} {{ . | quote }} {{ end }} \
+               && pip install --user {{ range .Values.extraPipPackages }} {{ . | quote }} {{ end }} \
               {{- end }}
               {{- if .Values.web.extraPipPackages }}
                && echo "*** installing extra pip packages..." \
@@ -248,8 +248,8 @@ spec:
             successThreshold: {{ .Values.web.readinessProbe.successThreshold }}
             failureThreshold: {{ .Values.web.readinessProbe.failureThreshold }}
           {{- end }}
-        {{- if .Values.airflow.extraContainers }}
-        {{- toYaml .Values.airflow.extraContainers | nindent 8 }}
+        {{- if .Values.extraContainers }}
+        {{- toYaml .Values.extraContainers | nindent 8 }}
         {{- end }}
       volumes:
         - name: scripts
@@ -292,11 +292,11 @@ spec:
             defaultMode: 0700
         {{- end }}
         {{- end }}
-        {{- range .Values.airflow.extraConfigmapMounts }}
+        {{- range .Values.extraConfigmapMounts }}
         - name: {{ .name }}
           configMap:
             name: {{ .configMap }}
         {{- end }}
-        {{- if .Values.airflow.extraVolumes }}
-        {{- toYaml .Values.airflow.extraVolumes | nindent 8 }}
+        {{- if .Values.extraVolumes }}
+        {{- toYaml .Values.extraVolumes | nindent 8 }}
         {{- end }}

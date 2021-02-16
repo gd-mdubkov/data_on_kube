@@ -146,7 +146,7 @@ When applicable, we use the secrets created by the postgres/redis charts (which 
 {{- /* --------------------------- */ -}}
 {{- /* ---------- REDIS ---------- */ -}}
 {{- /* --------------------------- */ -}}
-{{- if eq .Values.airflow.executor "CeleryExecutor" }}
+{{- if eq .Values.executor "CeleryExecutor" }}
 {{- if .Values.redis.enabled }}
 {{- if .Values.redis.existingSecret }}
 - name: REDIS_PASSWORD
@@ -177,7 +177,7 @@ When applicable, we use the secrets created by the postgres/redis charts (which 
 {{- /* ---------------------------- */ -}}
 {{- /* ---------- FLOWER ---------- */ -}}
 {{- /* ---------------------------- */ -}}
-{{- if and (.Values.flower.basicAuthSecret) (not .Values.airflow.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH) }}
+{{- if and (.Values.flower.basicAuthSecret) (not .Values.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH) }}
 - name: AIRFLOW__CELERY__FLOWER_BASIC_AUTH
   valueFrom:
     secretKeyRef:
@@ -187,7 +187,7 @@ When applicable, we use the secrets created by the postgres/redis charts (which 
 {{- /* ---------------------------- */ -}}
 {{- /* ---------- EXTRAS ---------- */ -}}
 {{- /* ---------------------------- */ -}}
-{{- if .Values.airflow.extraEnv }}
-{{ toYaml .Values.airflow.extraEnv }}
+{{- if .Values.extraEnv }}
+{{ toYaml .Values.extraEnv }}
 {{- end }}
 {{- end }}

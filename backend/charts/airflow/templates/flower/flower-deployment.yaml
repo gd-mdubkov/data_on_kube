@@ -1,4 +1,4 @@
-{{- if and (.Values.flower.enabled) (eq .Values.airflow.executor "CeleryExecutor") }}
+{{- if and (.Values.flower.enabled) (eq .Values.executor "CeleryExecutor") }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -48,9 +48,9 @@ spec:
         {{- toYaml .Values.flower.podLabels | nindent 8 }}
         {{- end }}
     spec:
-      {{- if .Values.airflow.image.pullSecret }}
+      {{- if .Values.image.pullSecret }}
       imagePullSecrets:
-        - name: {{ .Values.airflow.image.pullSecret }}
+        - name: {{ .Values.image.pullSecret }}
       {{- end }}
       restartPolicy: Always
       {{- if .Values.flower.nodeSelector }}
@@ -72,8 +72,8 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}-flower
-          image: {{ .Values.airflow.image.repository }}:{{ .Values.airflow.image.tag }}
-          imagePullPolicy: {{ .Values.airflow.image.pullPolicy }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
                 name: "{{ include "airflow.fullname" . }}-env"
@@ -116,7 +116,7 @@ spec:
               {{- end }}
 
           livenessProbe:
-            {{- if and (.Values.flower.basicAuthSecret) (not .Values.airflow.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH) }}
+            {{- if and (.Values.flower.basicAuthSecret) (not .Values.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH) }}
             exec:
               command:
                 - /bin/sh
@@ -136,10 +136,10 @@ spec:
               path: "{{ .Values.ingress.flower.path }}/"
               {{- end }}
               port: flower
-              {{- if .Values.airflow.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH }}
+              {{- if .Values.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH }}
               httpHeaders:
                 - name: Authorization
-                  value: Basic {{ .Values.airflow.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH | b64enc }}
+                  value: Basic {{ .Values.config.AIRFLOW__CELERY__FLOWER_BASIC_AUTH | b64enc }}
               {{- end }}
             {{- end }}
             initialDelaySeconds: 60
